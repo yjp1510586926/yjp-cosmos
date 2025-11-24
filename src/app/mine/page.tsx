@@ -18,7 +18,7 @@ export default function MinePage() {
   const [message, setMessage] = useState<Message | null>(null);
 
   useEffect(() => {
-    const savedWallet = storage.get(STORAGE_KEYS.WALLET, null);
+    const savedWallet = storage.get<{ address: string } | null>(STORAGE_KEYS.WALLET, null);
     if (savedWallet) {
       setMinerAddress(savedWallet.address);
     }
