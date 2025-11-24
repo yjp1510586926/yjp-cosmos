@@ -1,3 +1,8 @@
+/**
+ * 通用卡片容器组件
+ * 功能：提供统一的卡片样式容器
+ */
+
 interface CardProps {
   children: React.ReactNode;
   className?: string;

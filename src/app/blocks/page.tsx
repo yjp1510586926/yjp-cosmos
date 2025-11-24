@@ -1,8 +1,14 @@
+/**
+ * 区块浏览器页面
+ * 功能：查看所有区块的详细信息
+ */
+
 'use client';
 
 import { useEffect, useState } from 'react';
-import Header from '@/components/Header';
+import PageLayout from '@/components/PageLayout';
 import BlockCard from '@/components/BlockCard';
+import Button from '@/components/Button';
 import { useBlockchainStore } from '@/store/blockchainStore';
 import { Block } from '@/lib/blockchain/Block';
 
@@ -11,59 +17,50 @@ export default function BlocksPage() {
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // 监听区块链变化，自动更新区块列表
   useEffect(() => {
     fetchBlocks();
   }, [blockchain]);
 
+  /**
+   * 获取区块列表
+   * 按照最新的在前的顺序显示
+   */
   const fetchBlocks = () => {
     setLoading(true);
     setBlocks([...blockchain.chain].reverse());
     setLoading(false);
   };
 
+  // 加载状态
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Header />
-        <main className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-2xl text-gray-600 dark:text-gray-400">
-              加载中...
-            </div>
+      <PageLayout>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-2xl text-gray-600 dark:text-gray-400">
+            加载中...
           </div>
-        </main>
-      </div>
+        </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header />
-      
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-200 mb-2">
-              区块浏览器
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              共 {blocks.length} 个区块
-            </p>
-          </div>
-          <button
-            onClick={fetchBlocks}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
-          >
-            🔄 刷新
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 gap-6">
-          {blocks.map((block) => (
-            <BlockCard key={block.index} block={block} />
-          ))}
-        </div>
-      </main>
-    </div>
+    <PageLayout
+      title="区块浏览器"
+      subtitle={`共 ${blocks.length} 个区块`}
+      action={
+        <Button onClick={fetchBlocks}>
+          刷新
+        </Button>
+      }
+    >
+      {/* 区块列表 */}
+      <div className="grid grid-cols-1 gap-6">
+        {blocks.map((block) => (
+          <BlockCard key={block.index} block={block} />
+        ))}
+      </div>
+    </PageLayout>
   );
 }
