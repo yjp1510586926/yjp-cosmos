@@ -6,6 +6,8 @@ import Card from '@/components/Card';
 import { useBlockchainStore } from '@/store/blockchainStore';
 import { Transaction } from '@/lib/blockchain/Transaction';
 import { Wallet } from '@/lib/wallet/Wallet';
+import { truncateAddress, copyToClipboard, getMessageClasses, Message, storage } from '@/lib/utils';
+import { STORAGE_KEYS, BLOCKCHAIN_CONFIG } from '@/lib/constants';
 
 interface WalletInfo {
   id: string;
@@ -25,17 +27,13 @@ export default function WalletPage() {
   const [toAddress, setToAddress] = useState('');
   const [amount, setAmount] = useState('');
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<Message | null>(null);
 
   useEffect(() => {
-    // 尝试从localStorage加载钱包列表
-    const savedWallets = localStorage.getItem('wallets');
-    if (savedWallets) {
-      const walletsData = JSON.parse(savedWallets);
-      setWallets(walletsData);
-      if (walletsData.length > 0) {
-        setActiveWalletId(walletsData[0].id);
-      }
+    const savedWallets = storage.get<WalletInfo[]>(STORAGE_KEYS.WALLETS, []);
+    setWallets(savedWallets);
+    if (savedWallets.length > 0) {
+      setActiveWalletId(savedWallets[0].id);
     }
   }, []);
 
@@ -63,7 +61,7 @@ export default function WalletPage() {
       const updatedWallets = [...wallets, walletWithId];
       setWallets(updatedWallets);
       setActiveWalletId(walletWithId.id);
-      localStorage.setItem('wallets', JSON.stringify(updatedWallets));
+      storage.set(STORAGE_KEYS.WALLETS, updatedWallets);
       setMessage({ type: 'success', text: `${walletWithId.name} 创建成功！` });
     } catch (error) {
       setMessage({ type: 'error', text: '创建钱包失败' });
@@ -81,15 +79,9 @@ export default function WalletPage() {
 
     try {
       setLoading(true);
-      
-      // 创建交易
       const tx = new Transaction(activeWallet.address, toAddress, parseFloat(amount));
-      
-      // 使用私钥签名
       const walletInstance = new Wallet(activeWallet.privateKey);
       tx.signTransaction(walletInstance.getKeyPair());
-      
-      // 添加到区块链
       addTransaction(tx);
       
       setMessage({ type: 'success', text: '交易已提交！需要挖矿才能确认' });
@@ -102,13 +94,13 @@ export default function WalletPage() {
     }
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setMessage({ type: 'success', text: '已复制到剪贴板' });
-  };
-
-  const truncateAddress = (addr: string) => {
-    return `${addr.substring(0, 10)}...${addr.substring(addr.length - 10)}`;
+  const handleCopy = async (text: string) => {
+    const success = await copyToClipboard(text);
+    if (success) {
+      setMessage({ type: 'success', text: '已复制到剪贴板' });
+    } else {
+      setMessage({ type: 'error', text: '复制失败' });
+    }
   };
 
   const quickFillAddress = (address: string) => {
@@ -127,20 +119,15 @@ export default function WalletPage() {
           </h1>
           <button
             onClick={createNewWallet}
-            disabled={loading || wallets.length >= 5}
+            disabled={loading || wallets.length >= BLOCKCHAIN_CONFIG.MAX_WALLETS}
             className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all font-semibold disabled:opacity-50"
           >
             {loading ? '创建中...' : '➕ 新建钱包'}
           </button>
         </div>
 
-        {/* 消息提示 */}
         {message && (
-          <div className={`p-4 rounded-lg mb-6 ${
-            message.type === 'success' 
-              ? 'bg-green-100 border border-green-300 text-green-800 dark:bg-green-900/20 dark:border-green-700 dark:text-green-300'
-              : 'bg-red-100 border border-red-300 text-red-800 dark:bg-red-900/20 dark:border-red-700 dark:text-red-300'
-          }`}>
+          <div className={getMessageClasses(message.type)}>
             {message.text}
           </div>
         )}
@@ -166,10 +153,9 @@ export default function WalletPage() {
           </Card>
         ) : (
           <div className="space-y-6">
-            {/* 钱包列表 */}
             <Card>
               <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200">
-                我的钱包 ({wallets.length}/5)
+                我的钱包 ({wallets.length}/{BLOCKCHAIN_CONFIG.MAX_WALLETS})
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {wallets.map((wallet) => {
@@ -207,10 +193,8 @@ export default function WalletPage() {
               </div>
             </Card>
 
-            {/* 当前钱包详情和转账 */}
             {activeWallet && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* 钱包详情 */}
                 <Card>
                   <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-200">
                     {activeWallet.name} - 详细信息
@@ -224,7 +208,7 @@ export default function WalletPage() {
                       <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded font-mono text-xs break-all flex items-start justify-between gap-2">
                         <span className="flex-1">{activeWallet.address}</span>
                         <button
-                          onClick={() => copyToClipboard(activeWallet.address)}
+                          onClick={() => handleCopy(activeWallet.address)}
                           className="text-blue-600 hover:text-blue-700 flex-shrink-0"
                         >
                           📋
@@ -239,7 +223,7 @@ export default function WalletPage() {
                       <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded font-mono text-xs break-all border border-red-300 dark:border-red-700 flex items-start justify-between gap-2">
                         <span className="flex-1">{activeWallet.privateKey}</span>
                         <button
-                          onClick={() => copyToClipboard(activeWallet.privateKey)}
+                          onClick={() => handleCopy(activeWallet.privateKey)}
                           className="text-red-600 hover:text-red-700 flex-shrink-0"
                         >
                           📋
@@ -260,7 +244,6 @@ export default function WalletPage() {
                   </div>
                 </Card>
 
-                {/* 发送交易 */}
                 <Card>
                   <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-200">
                     发送代币
@@ -279,7 +262,6 @@ export default function WalletPage() {
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-200"
                       />
                       
-                      {/* 快速选择其他钱包 */}
                       {wallets.filter(w => w.id !== activeWalletId).length > 0 && (
                         <div className="mt-2">
                           <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">

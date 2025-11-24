@@ -5,6 +5,8 @@ import Header from '@/components/Header';
 import Card from '@/components/Card';
 import { useBlockchainStore } from '@/store/blockchainStore';
 import { Transaction } from '@/lib/blockchain/Transaction';
+import { truncateAddress, getMessageClasses, Message, storage } from '@/lib/utils';
+import { STORAGE_KEYS, BLOCKCHAIN_CONFIG } from '@/lib/constants';
 
 export default function MinePage() {
   const mine = useBlockchainStore((state) => state.mine);
@@ -13,14 +15,12 @@ export default function MinePage() {
   const [minerAddress, setMinerAddress] = useState('');
   const [pendingTx, setPendingTx] = useState<Transaction[]>([]);
   const [mining, setMining] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<Message | null>(null);
 
   useEffect(() => {
-    // 尝试从localStorage加载钱包地址
-    const savedWallet = localStorage.getItem('wallet');
+    const savedWallet = storage.get(STORAGE_KEYS.WALLET, null);
     if (savedWallet) {
-      const wallet = JSON.parse(savedWallet);
-      setMinerAddress(wallet.address);
+      setMinerAddress(savedWallet.address);
     }
     fetchPendingTransactions();
   }, []);
@@ -42,7 +42,7 @@ export default function MinePage() {
 
     try {
       setMining(true);
-      setMessage({ type: 'success', text: '⛏️  正在挖矿中...' });
+      setMessage({ type: 'info', text: '⛏️  正在挖矿中...' });
       
       const block = await mine(minerAddress);
       
@@ -51,7 +51,6 @@ export default function MinePage() {
         text: `🎉 挖矿成功！区块 #${block.index} 已添加到链上` 
       });
       
-      // 刷新待处理交易
       fetchPendingTransactions();
     } catch (error: any) {
       setMessage({ 
@@ -63,11 +62,6 @@ export default function MinePage() {
     }
   };
 
-  const truncateAddress = (addr: string | null) => {
-    if (!addr) return '系统奖励';
-    return `${addr.substring(0, 10)}...${addr.substring(addr.length - 10)}`;
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header />
@@ -77,19 +71,13 @@ export default function MinePage() {
           ⛏️  挖矿中心
         </h1>
 
-        {/* 消息提示 */}
         {message && (
-          <div className={`p-4 rounded-lg mb-6 ${
-            message.type === 'success' 
-              ? 'bg-green-100 border border-green-300 text-green-800 dark:bg-green-900/20 dark:border-green-700 dark:text-green-300'
-              : 'bg-red-100 border border-red-300 text-red-800 dark:bg-red-900/20 dark:border-red-700 dark:text-red-300'
-          }`}>
+          <div className={getMessageClasses(message.type)}>
             {message.text}
           </div>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* 挖矿控制 */}
           <Card>
             <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-200">
               开始挖矿
@@ -117,7 +105,7 @@ export default function MinePage() {
                   💰 挖矿奖励
                 </h3>
                 <p className="text-sm text-blue-700 dark:text-blue-400">
-                  每成功挖出一个区块，将获得 <strong>50 代币</strong> 奖励
+                  每成功挖出一个区块，将获得 <strong>{BLOCKCHAIN_CONFIG.MINING_REWARD} 代币</strong> 奖励
                 </p>
               </div>
 
@@ -144,7 +132,6 @@ export default function MinePage() {
             </div>
           </Card>
 
-          {/* 待处理交易 */}
           <Card>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">

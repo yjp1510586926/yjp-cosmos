@@ -12,10 +12,8 @@ export class Wallet {
 
   constructor(privateKey?: string) {
     if (privateKey) {
-      // 从私钥恢复钱包
       this.keyPair = ec.keyFromPrivate(privateKey, 'hex');
     } else {
-      // 生成新钱包
       this.keyPair = ec.genKeyPair();
     }
 
@@ -59,4 +57,3 @@ export class Wallet {
     return wallets;
   }
 }
-

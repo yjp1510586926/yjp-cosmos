@@ -12,9 +12,9 @@ export class Blockchain {
 
   constructor() {
     this.chain = [this.createGenesisBlock()];
-    this.difficulty = 4; // 挖矿难度
+    this.difficulty = 4;
     this.pendingTransactions = [];
-    this.miningReward = 50; // 挖矿奖励
+    this.miningReward = 50;
   }
 
   /**
@@ -23,7 +23,6 @@ export class Blockchain {
   createGenesisBlock(): Block {
     const genesisBlock = new Block(0, Date.now(), [], '0');
     genesisBlock.hash = genesisBlock.calculateHash();
-    console.log('🎉 创世区块已创建');
     return genesisBlock;
   }
 
@@ -38,15 +37,9 @@ export class Blockchain {
    * 挖掘待处理交易（挖矿）
    */
   minePendingTransactions(miningRewardAddress: string): Block {
-    // 创建挖矿奖励交易
-    const rewardTx = new Transaction(
-      null,
-      miningRewardAddress,
-      this.miningReward
-    );
+    const rewardTx = new Transaction(null, miningRewardAddress, this.miningReward);
     this.pendingTransactions.push(rewardTx);
 
-    // 创建新区块
     const block = new Block(
       this.chain.length,
       Date.now(),
@@ -54,13 +47,8 @@ export class Blockchain {
       this.getLatestBlock().hash
     );
 
-    // 挖矿
     block.mineBlock(this.difficulty);
-
-    // 将区块添加到链上
     this.chain.push(block);
-
-    // 清空待处理交易
     this.pendingTransactions = [];
 
     return block;
@@ -82,14 +70,12 @@ export class Blockchain {
       throw new Error('交易金额必须大于0');
     }
 
-    // 检查余额是否足够
     const senderBalance = this.getBalanceOfAddress(transaction.fromAddress);
     if (senderBalance < transaction.amount) {
       throw new Error('余额不足');
     }
 
     this.pendingTransactions.push(transaction);
-    console.log('✅ 交易已添加到待处理池');
   }
 
   /**
@@ -103,7 +89,6 @@ export class Blockchain {
         if (trans.fromAddress === address) {
           balance -= trans.amount;
         }
-
         if (trans.toAddress === address) {
           balance += trans.amount;
         }
@@ -134,7 +119,6 @@ export class Blockchain {
    * 验证区块链完整性
    */
   isChainValid(): boolean {
-    // 验证创世区块
     const realGenesis = JSON.stringify(this.createGenesisBlock());
     const currentGenesis = JSON.stringify(this.chain[0]);
 
@@ -142,22 +126,18 @@ export class Blockchain {
       return false;
     }
 
-    // 验证其他区块
     for (let i = 1; i < this.chain.length; i++) {
       const currentBlock = this.chain[i];
       const previousBlock = this.chain[i - 1];
 
-      // 验证交易
       if (!currentBlock.hasValidTransactions()) {
         return false;
       }
 
-      // 验证哈希
       if (currentBlock.hash !== currentBlock.calculateHash()) {
         return false;
       }
 
-      // 验证链接
       if (currentBlock.previousHash !== previousBlock.hash) {
         return false;
       }
@@ -179,4 +159,3 @@ export class Blockchain {
     };
   }
 }
-

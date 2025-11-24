@@ -37,22 +37,11 @@ export class Block {
    */
   mineBlock(difficulty: number): void {
     const target = Array(difficulty + 1).join('0');
-    
-    console.log(`⛏️  开始挖矿区块 #${this.index}...`);
-    const startTime = Date.now();
 
     while (this.hash.substring(0, difficulty) !== target) {
       this.nonce++;
       this.hash = this.calculateHash();
     }
-
-    const endTime = Date.now();
-    const duration = ((endTime - startTime) / 1000).toFixed(2);
-    
-    console.log(`✅ 区块挖掘成功！`);
-    console.log(`   哈希: ${this.hash}`);
-    console.log(`   Nonce: ${this.nonce}`);
-    console.log(`   耗时: ${duration}秒\n`);
   }
 
   /**
@@ -81,4 +70,3 @@ export class Block {
     };
   }
 }
-

@@ -17,7 +17,6 @@ export default function BlocksPage() {
 
   const fetchBlocks = () => {
     setLoading(true);
-    // 反转数组，最新的区块在前面
     setBlocks([...blockchain.chain].reverse());
     setLoading(false);
   };

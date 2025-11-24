@@ -5,15 +5,15 @@ interface StatCardProps {
   color?: string;
 }
 
-export default function StatCard({ title, value, icon, color = 'blue' }: StatCardProps) {
-  const colorClasses: Record<string, string> = {
-    blue: 'from-blue-500 to-blue-600',
-    green: 'from-green-500 to-green-600',
-    purple: 'from-purple-500 to-purple-600',
-    orange: 'from-orange-500 to-orange-600',
-    pink: 'from-pink-500 to-pink-600',
-  };
+const colorClasses: Record<string, string> = {
+  blue: 'from-blue-500 to-blue-600',
+  green: 'from-green-500 to-green-600',
+  purple: 'from-purple-500 to-purple-600',
+  orange: 'from-orange-500 to-orange-600',
+  pink: 'from-pink-500 to-pink-600',
+};
 
+export default function StatCard({ title, value, icon, color = 'blue' }: StatCardProps) {
   return (
     <div className={`bg-gradient-to-br ${colorClasses[color]} text-white rounded-lg shadow-lg p-6`}>
       <div className="flex items-center justify-between">
@@ -26,4 +26,3 @@ export default function StatCard({ title, value, icon, color = 'blue' }: StatCar
     </div>
   );
 }
-

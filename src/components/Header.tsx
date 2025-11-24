@@ -5,8 +5,14 @@ import { usePathname } from 'next/navigation';
 
 export default function Header() {
   const pathname = usePathname();
-
   const isActive = (path: string) => pathname === path;
+
+  const navItems = [
+    { path: '/', icon: '🏠', label: '首页' },
+    { path: '/blocks', icon: '📦', label: '区块浏览' },
+    { path: '/wallet', icon: '👛', label: '钱包' },
+    { path: '/mine', icon: '⛏️', label: '挖矿' },
+  ];
 
   return (
     <header className="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
@@ -18,50 +24,22 @@ export default function Header() {
           </Link>
           
           <nav className="flex space-x-1">
-            <Link
-              href="/"
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                isActive('/') 
-                  ? 'bg-white/20 font-semibold' 
-                  : 'hover:bg-white/10'
-              }`}
-            >
-              🏠 首页
-            </Link>
-            <Link
-              href="/blocks"
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                isActive('/blocks') 
-                  ? 'bg-white/20 font-semibold' 
-                  : 'hover:bg-white/10'
-              }`}
-            >
-              📦 区块浏览
-            </Link>
-            <Link
-              href="/wallet"
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                isActive('/wallet') 
-                  ? 'bg-white/20 font-semibold' 
-                  : 'hover:bg-white/10'
-              }`}
-            >
-              👛 钱包
-            </Link>
-            <Link
-              href="/mine"
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                isActive('/mine') 
-                  ? 'bg-white/20 font-semibold' 
-                  : 'hover:bg-white/10'
-              }`}
-            >
-              ⛏️ 挖矿
-            </Link>
+            {navItems.map(({ path, icon, label }) => (
+              <Link
+                key={path}
+                href={path}
+                className={`px-4 py-2 rounded-lg transition-colors ${
+                  isActive(path) 
+                    ? 'bg-white/20 font-semibold' 
+                    : 'hover:bg-white/10'
+                }`}
+              >
+                {icon} {label}
+              </Link>
+            ))}
           </nav>
         </div>
       </div>
     </header>
   );
 }
-

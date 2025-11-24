@@ -6,6 +6,7 @@ import StatCard from '@/components/StatCard';
 import BlockCard from '@/components/BlockCard';
 import { useBlockchainStore } from '@/store/blockchainStore';
 import { Block } from '@/lib/blockchain/Block';
+import { REFRESH_INTERVALS } from '@/lib/constants';
 
 export default function Home() {
   const blockchain = useBlockchainStore((state) => state.blockchain);
@@ -17,13 +18,12 @@ export default function Home() {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 10000); // 每10秒刷新
+    const interval = setInterval(fetchData, REFRESH_INTERVALS.BLOCKCHAIN_STATS);
     return () => clearInterval(interval);
   }, [blockchain]);
 
   const fetchData = () => {
     setStats(getStats());
-    // 获取最近3个区块
     const blocks = [...blockchain.chain].slice(-3).reverse();
     setRecentBlocks(blocks);
     setLoading(false);
@@ -49,7 +49,6 @@ export default function Home() {
       <Header />
       
       <main className="container mx-auto px-4 py-8">
-        {/* 标题 */}
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             YJP 区块链浏览器
@@ -62,7 +61,6 @@ export default function Home() {
           </p>
         </div>
 
-        {/* 统计卡片 */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             <StatCard
@@ -92,7 +90,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* 链状态 */}
         {stats && (
           <div className="mb-12">
             <div className={`p-4 rounded-lg ${
@@ -116,7 +113,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* 最近区块 */}
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200">

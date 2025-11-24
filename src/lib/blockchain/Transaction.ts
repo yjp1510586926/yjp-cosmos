@@ -33,7 +33,6 @@ export class Transaction {
    * 签名交易
    */
   signTransaction(signingKey: EC.KeyPair): void {
-    // 检查公钥是否匹配发送地址
     if (signingKey.getPublic('hex') !== this.fromAddress) {
       throw new Error('你不能为其他钱包签署交易！');
     }
@@ -47,7 +46,6 @@ export class Transaction {
    * 验证交易签名
    */
   isValid(): boolean {
-    // 挖矿奖励交易（没有发送方）始终有效
     if (this.fromAddress === null) return true;
 
     if (!this.signature || this.signature.length === 0) {
@@ -72,4 +70,3 @@ export class Transaction {
     };
   }
 }
-
