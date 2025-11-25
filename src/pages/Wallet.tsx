@@ -3,7 +3,7 @@
  * 功能：创建钱包、查看余额、发送交易
  */
 
-'use client';
+
 
 import { useState, useEffect } from 'react';
 import PageLayout from '@/components/PageLayout';

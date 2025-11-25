@@ -3,8 +3,6 @@
  * 功能：查看所有区块的详细信息
  */
 
-'use client';
-
 import { useEffect, useState } from 'react';
 import PageLayout from '@/components/PageLayout';
 import BlockCard from '@/components/BlockCard';

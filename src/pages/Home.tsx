@@ -3,8 +3,6 @@
  * 功能：展示区块链统计数据、最近的区块
  */
 
-'use client';
-
 import { useEffect, useState } from 'react';
 import PageLayout from '@/components/PageLayout';
 import StatCard from '@/components/StatCard';

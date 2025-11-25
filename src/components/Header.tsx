@@ -3,10 +3,7 @@
  * 功能：提供全局导航菜单
  */
 
-'use client';
-
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { Link, useLocation } from 'react-router-dom';
 
 // 导航菜单配置
 const navItems = [
@@ -17,17 +14,17 @@ const navItems = [
 ];
 
 export default function Header() {
-  const pathname = usePathname();
+  const location = useLocation();
   
   // 判断当前路径是否为活动状态
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <header className="bg-black text-white shadow-lg border-b border-gray-800">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="text-2xl font-bold hover:opacity-90 transition-opacity">
+          <Link to="/" className="text-2xl font-bold hover:opacity-90 transition-opacity">
             YJP区块链
           </Link>
           
@@ -36,7 +33,7 @@ export default function Header() {
             {navItems.map(({ path, label }) => (
               <Link
                 key={path}
-                href={path}
+                to={path}
                 className={`px-4 py-2 rounded-lg transition-colors ${
                   isActive(path) 
                     ? 'bg-gray-800 font-semibold border border-gray-700' 
@@ -52,3 +49,4 @@ export default function Header() {
     </header>
   );
 }
+

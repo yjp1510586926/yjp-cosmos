@@ -1,6 +1,6 @@
 # YJP Blockchain - 纯前端区块链项目
 
-一个完全使用 JavaScript/TypeScript + Next.js 实现的**纯前端**区块链系统，无需后端服务器！
+一个完全使用 JavaScript/TypeScript + Vite + React 实现的**纯前端**区块链系统，无需后端服务器！
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)
@@ -20,7 +20,7 @@
 - ✅ **Zustand 状态管理** - 简单高效的状态管理
 - ✅ **LocalStorage 持久化** - 数据自动保存
 - ✅ **真实加密算法** - SHA-256 + ECDSA
-- ✅ **Next.js 14** - 现代化 React 框架
+- ✅ **Vite + React** - 现代化前端构建工具
 - ✅ **一键启动** - 只需一个命令
 
 ## 🚀 快速开始
@@ -33,7 +33,6 @@
 ### 安装依赖
 
 ```bash
-cd frontend
 npm install
 ```
 
@@ -51,33 +50,38 @@ npm run dev
 
 ```
 yjp-cosmos/
-├── frontend/                    # Next.js前端项目
-│   ├── src/
-│   │   ├── app/                 # Next.js页面
-│   │   │   ├── page.tsx         # 首页
-│   │   │   ├── blocks/          # 区块浏览器
-│   │   │   ├── wallet/          # 钱包管理
-│   │   │   └── mine/            # 挖矿页面
-│   │   ├── components/          # React组件
-│   │   ├── lib/                 # 区块链核心逻辑
-│   │   │   ├── blockchain/
-│   │   │   │   ├── Block.ts            # 区块类
-│   │   │   │   ├── Blockchain.ts       # 区块链管理
-│   │   │   │   └── Transaction.ts      # 交易处理
-│   │   │   └── wallet/
-│   │   │       └── Wallet.ts           # 钱包生成
-│   │   └── store/
-│   │       └── blockchainStore.ts      # Zustand状态管理
-│   ├── package.json
-│   └── tsconfig.json
-└── README.md
+├── src/
+│   ├── pages/                   # React 页面
+│   │   ├── Home.tsx             # 首页
+│   │   ├── Blocks.tsx           # 区块浏览器
+│   │   ├── Wallet.tsx           # 钱包管理
+│   │   └── Mine.tsx             # 挖矿页面
+│   ├── components/              # React组件
+│   ├── lib/                     # 区块链核心逻辑
+│   │   ├── blockchain/
+│   │   │   ├── Block.ts         # 区块类
+│   │   │   ├── Blockchain.ts    # 区块链管理
+│   │   │   └── Transaction.ts   # 交易处理
+│   │   └── wallet/
+│   │       └── Wallet.ts        # 钱包生成
+│   ├── store/
+│   │   └── blockchainStore.ts   # Zustand状态管理
+│   ├── App.tsx                  # 主应用组件
+│   ├── main.tsx                 # 应用入口
+│   └── index.css                # 全局样式
+├── index.html                   # HTML 入口
+├── vite.config.ts               # Vite 配置
+├── package.json
+└── tsconfig.json
 ```
 
 ## 🔧 技术栈
 
 ### 核心技术
 
-- **Next.js 14** - React 框架
+- **Vite** - 快速的前端构建工具
+- **React 18** - UI 框架
+- **React Router** - 路由管理
 - **TypeScript** - 类型安全
 - **Zustand** - 状态管理
 - **TailwindCSS** - 样式框架

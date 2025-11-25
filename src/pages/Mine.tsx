@@ -3,7 +3,7 @@
  * 功能：挖掘新区块，处理待处理的交易，获取挖矿奖励
  */
 
-'use client';
+
 
 import { useState, useEffect } from 'react';
 import PageLayout from '@/components/PageLayout';
